@@ -5,7 +5,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
+import java.util.UUID;
+
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.Jwts;
+import java.security.*;
 
 import com.example.user.model.PhoneModel;
 import com.example.user.model.UserModel;
@@ -23,13 +30,14 @@ public class UserMapper {
                 userDTO.setCreated(createdFormatted);
             }
             
-            java.sql.Date lastLoginDate = rs.getDate("last_login");
-            if (lastLoginDate != null) {
-                String lastLoginFormatted = dateToString(lastLoginDate);
-                userDTO.setLastLogin(lastLoginFormatted);
-            }
+            LocalDateTime currentDate = LocalDateTime.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            String currentDateTime = currentDate.format(formatter);
 
-            userDTO.setToken(rs.getString("token"));
+            userDTO.setLastLogin(currentDateTime);
+
+            String token = generateJwtToken();
+            userDTO.setToken(token);
             userDTO.setIsActive(rs.getInt("is_active"));
             userDTO.setName(rs.getString("name"));
             userDTO.setEmail(rs.getString("email"));
@@ -45,13 +53,20 @@ public class UserMapper {
     public static UserModel mapToModel (Map<String, Object> requestBody){
         UserModel userDTO = new UserModel();
         PhoneModel phoneNumber = new PhoneModel();
-        userDTO.setCreated((String) requestBody.get("created"));
-        userDTO.setLastLogin((String) requestBody.get("lastLogin"));
-        userDTO.setToken((String) requestBody.get("token"));
+        
+        String token = generateJwtToken();
+        UUID userId = UUID.randomUUID();
+        userDTO.setId(userId.toString());
 
-        boolean isActive = (boolean) requestBody.get("isActive");
-        int isActiveInt = isActive ? 1 : 0;
-        userDTO.setIsActive(isActiveInt);
+        LocalDateTime currentDate = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String currentDateTime = currentDate.format(formatter);
+
+        userDTO.setCreated(currentDateTime);
+        userDTO.setLastLogin(currentDateTime);
+
+        userDTO.setToken(token);
+        userDTO.setIsActive(1);
 
         userDTO.setName((String) requestBody.get("name"));
         userDTO.setEmail((String) requestBody.get("email"));
@@ -73,6 +88,28 @@ public class UserMapper {
         SimpleDateFormat formatter = new SimpleDateFormat("EEEE, dd MMMM yyyy HH:mm:ss");
         String Formatted = formatter.format(datejava);
         return Formatted;
+    }
+
+    private static String generateJwtToken() {
+        KeyPair keyPair = generateKeyPair();
+
+        String token = Jwts.builder()
+                .signWith(keyPair.getPrivate(), SignatureAlgorithm.ES256)
+                .compact();
+
+        return token;
+    }
+
+    private static KeyPair generateKeyPair() {
+        try {
+            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("EC");
+            SecureRandom secureRandom = SecureRandom.getInstanceStrong();
+            keyPairGenerator.initialize(256, secureRandom);
+            return keyPairGenerator.generateKeyPair();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }

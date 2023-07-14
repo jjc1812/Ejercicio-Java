@@ -7,9 +7,9 @@ import org.springframework.web.bind.annotation.*;
 import java.sql.Timestamp;
 import com.example.user.mapper.UserMapper;
 import com.example.user.model.ResponseError;
+import com.example.user.model.ResponseUser;
 import com.example.user.model.UserModel;
 import com.example.user.service.UserService;
-import com.nimbusds.oauth2.sdk.ErrorResponse;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -43,7 +43,7 @@ public class UserController {
         List<ResponseError.ErrorDetails> errorList = new ArrayList<>();
         try {
             UserModel newUser = UserMapper.mapToModel(requestBody);
-            UserModel user = userService.postUser(newUser);
+            ResponseUser user = userService.postUser(newUser);
             return ResponseEntity.status(HttpStatus.CREATED).body(user);
         } catch (IllegalArgumentException e) {
             Timestamp timestamp = new Timestamp(System.currentTimeMillis());
