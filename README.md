@@ -48,3 +48,5 @@ CREATE TABLE `user` (
   `phone_country_code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   PRIMARY KEY (`id_user`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+Los diagramas de secuencia y de componentes se encuentran dentro de ./Diagramas
