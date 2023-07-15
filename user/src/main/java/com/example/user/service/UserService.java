@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
-import com.example.user.DTO.UserDAO;
+import com.example.user.DAO.UserDAO;
 import com.example.user.model.ResponseUser;
 import com.example.user.model.UserModel;
 

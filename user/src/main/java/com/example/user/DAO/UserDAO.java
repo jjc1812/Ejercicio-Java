@@ -1,4 +1,4 @@
-package com.example.user.DTO;
+package com.example.user.DAO;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.text.ParseException;
